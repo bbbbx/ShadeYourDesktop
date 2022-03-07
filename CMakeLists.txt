@@ -2,8 +2,13 @@ cmake_minimum_required( VERSION 3.1 )
 
 project( ShadeYourDesktop )
 
-set( CMAKE_CXX_STANDARD 14 )
+set( CMAKE_CXX_STANDARD 17 )
 
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}" )
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
 
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/extern/glfw/include
@@ -29,9 +34,13 @@ endif()
 set(
   SHADE_YOUR_DESKTOP_SRC
   ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/set_window_behind_desktop_icon.mm
   ${CMAKE_CURRENT_SOURCE_DIR}/extern/glad/src/gl.c
 )
+if ( APPLE )
+  list( APPEND SHADE_YOUR_DESKTOP_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/put_window_behind_desktop_icons_darwin.mm" )
+  elseif( MSVC )
+  list( APPEND SHADE_YOUR_DESKTOP_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/put_window_behind_desktop_icons_win.cpp" )
+endif()
 
 add_executable( ShadeYourDesktop ${SHADE_YOUR_DESKTOP_SRC} )
 target_link_libraries( ShadeYourDesktop glfw )

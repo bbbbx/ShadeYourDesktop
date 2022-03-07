@@ -6,14 +6,18 @@
 #include <GLFW/glfw3.h>
 #include <glad/gl.h>
 
+#if defined(__APPLE__)
 #define GLFW_EXPOSE_NATIVE_COCOA
+#elif defined(_WIN32) || defined(_WIN64)
+#define GLFW_EXPOSE_NATIVE_WIN32
+#endif
 #include <GLFW/glfw3native.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
 #include "Renderer.hpp"
-#include "set_window_behind_desktop_icon.h"
+#include "put_window_behind_desktop_icons.h"
 
 
 class Application
@@ -146,8 +150,13 @@ void Application::initWindow()
     return;
   }
 
+#if defined(__APPLE__)
   id nativeWindow = glfwGetCocoaWindow(window);
-  set_window_behind_desktop_icon(nativeWindow);
+  put_window_behind_desktop_icons(nativeWindow);
+#elif defined(_WIN32) || defined(_WIN64)
+  HWND nativeWindow = glfwGetWin32Window(window);
+  put_window_behind_desktop_icons(nativeWindow);
+#endif
 
   /* Make the window's context current */
   glfwMakeContextCurrent(window);

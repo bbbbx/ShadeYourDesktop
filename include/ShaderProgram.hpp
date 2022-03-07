@@ -6,6 +6,10 @@
 #include <iostream>
 #include <fstream>
 
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+#include <glad/gl.h>
+
 #include "string_utils.hpp"
 
 static const char *VERTEX_SHADER_SOURCE =
@@ -52,7 +56,7 @@ void getActiveUniforms(GLuint program, std::unordered_map<uint32_t, Uniform> &un
   glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &uniformCount);
   for (size_t i = 0; i < uniformCount; i++)
   {
-    GLsizei bufSize = 64;
+    const GLsizei bufSize = 64;
     GLchar name[bufSize];
     GLsizei length = 0;
     GLint size;
@@ -76,8 +80,8 @@ private:
   GLuint vertShader, fragShader;
 
 public:
-  std::vector<char> vertShaderSource;
-  std::vector<char> fragShaderSource;
+  std::string vertShaderSource;
+  std::string fragShaderSource;
   GLuint program;
   std::unordered_map<uint32_t, Uniform> uniforms;
 
@@ -87,25 +91,21 @@ public:
 
   void createGLProgram();
 
-  static GLuint createShader(GLenum shaderType, std::vector<char> shaderSource) {
+  static GLuint createShader(GLenum shaderType, std::string &shaderSource) {
     GLuint shader = glCreateShader(shaderType);
     int size = shaderSource.size();
-    const char *source = shaderSource.data();
+    const char *source = shaderSource.c_str();
     glShaderSource(shader, 1, &source, &size);
     glCompileShader(shader);
 
     int success = 0;
-    int bufSize = 512;
+    const int bufSize = 512;
     char infoLog[bufSize];
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
     if (!success) {
       int length = 0;
       glGetShaderInfoLog(shader, bufSize, &length, infoLog);
-      std::string s;
-      for (auto c : shaderSource) {
-        s.push_back(c);
-      }
-      std::cout << "Compile shader failed:\n" << infoLog << "\nShader Source:\n" << s << std::endl;
+      std::cout << "Compile Shader failed:\n" << infoLog << "\nShader Source:\n" << shaderSource << std::endl;
       return -1;
     }
 
@@ -119,10 +119,11 @@ public:
     glLinkProgram(program);
 
     int success = 0;
-    char infoLog[512];
+    const int bufSize = 512;
+    char infoLog[bufSize];
     glGetProgramiv(program, GL_LINK_STATUS, &success);
     if (!success) {
-      glGetProgramInfoLog(program, 512, NULL, infoLog);
+      glGetProgramInfoLog(program, bufSize, NULL, infoLog);
       std::cerr << "Link Program failed:\n\t" << infoLog << std::endl;
       return -1;
     }
@@ -150,7 +151,7 @@ public:
     file.close();
 
     ShaderProgram *shaderProgram = new ShaderProgram();
-    shaderProgram->fragShaderSource = std::move(buffer);
+    shaderProgram->fragShaderSource = std::string(buffer.begin(), buffer.end());
     shaderProgram->createGLProgram();
 
     return shaderProgram;
@@ -158,15 +159,7 @@ public:
 };
 
 ShaderProgram::ShaderProgram() {
-  int size = strlen(VERTEX_SHADER_SOURCE);
-  vertShaderSource.resize(size);
-  vertShaderSource.clear();
-
-  for (size_t i = 0; i < size; i++)
-  {
-    vertShaderSource.push_back(VERTEX_SHADER_SOURCE[i]);
-  }
-
+  vertShaderSource = std::string(VERTEX_SHADER_SOURCE);
 }
 
 void ShaderProgram::createGLProgram()
@@ -180,37 +173,19 @@ void ShaderProgram::createGLProgram()
     return;
   }
 
-  int size = strlen(FRAGMENT_SHADER_SOURCE_PREFIX);
-  std::vector<char> fullFragShaderSource;
-  for (size_t i = 0; i < size; i++)
-  {
-    fullFragShaderSource.push_back(FRAGMENT_SHADER_SOURCE_PREFIX[i]);
-  }
-
-  size = fragShaderSource.size();
-  char *data = fragShaderSource.data();
-  for (size_t i = 0; i < size; i++)
-  {
-    fullFragShaderSource.push_back(data[i]);
-  }
-
-  std::string tmp = std::string(fullFragShaderSource.begin(), fullFragShaderSource.end());
+  std::string fullFragShaderSource =
+    std::string(FRAGMENT_SHADER_SOURCE_PREFIX) +
+    std::string(fragShaderSource);
   std::smatch searchResult;
-  std::regex_search(tmp, searchResult, mainImageReg);
+  std::regex_search(fullFragShaderSource, searchResult, mainImageReg);
   if (searchResult.length() > 0) {
     searchResult.empty();
 
-    std::regex_search(tmp, searchResult, mainReg);
-
+    std::regex_search(fullFragShaderSource, searchResult, mainReg);
     if (searchResult.length() <= 0) {
-      size = strlen(FRAGMENT_SHADER_SOURCE_SUFFIX);
-      for (size_t i = 0; i < size; i++)
-      {
-        fullFragShaderSource.push_back(FRAGMENT_SHADER_SOURCE_SUFFIX[i]);
-      }
+      fullFragShaderSource += std::string(FRAGMENT_SHADER_SOURCE_SUFFIX);
     }
   }
-
 
   vertShader = ShaderProgram::createShader(GL_VERTEX_SHADER,   vertShaderSource);
   fragShader = ShaderProgram::createShader(GL_FRAGMENT_SHADER, fullFragShaderSource);
@@ -221,7 +196,7 @@ void ShaderProgram::createGLProgram()
   // printf("attribCount: %d\n", attribCount);
   for (size_t i = 0; i < attribCount; i++)
   {
-    GLsizei bufSize = 64;
+    const GLsizei bufSize = 64;
     GLchar name[bufSize];
     GLsizei length = 0;
     GLint size;
