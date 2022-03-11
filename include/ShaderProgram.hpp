@@ -5,6 +5,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <cstdlib>
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -74,6 +75,26 @@ void getActiveUniforms(GLuint program, std::unordered_map<uint32_t, Uniform> &un
   }
 }
 
+// A fork of https://stackoverflow.com/questions/116038/how-do-i-read-an-entire-file-into-a-stdstring-in-c
+auto read_file(std::string_view path) -> std::string {
+  constexpr auto read_size = std::size_t(4096);
+  auto stream = std::ifstream(path.data());
+  if (!stream.is_open()) {
+    std::cerr << "Failed to open file: " << path << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+  stream.exceptions(std::ios_base::badbit);
+
+  auto out = std::string();
+  auto buf = std::string(read_size, '\0');
+  while (stream.read(& buf[0], read_size)) {
+    out.append(buf, 0, stream.gcount());
+  }
+  out.append(buf, 0, stream.gcount());
+  stream.close();
+  return out;
+}
+
 class ShaderProgram
 {
 private:
@@ -134,24 +155,9 @@ public:
     return program;
   }
 
-  static ShaderProgram *loadFromFilename(const std::string &filename) {
-    std::ifstream file(filename, std::ios::ate);
-
-    if (!file.is_open()) {
-      std::cerr << "Failed to open file: " << filename << std::endl;
-      throw std::runtime_error("Failed to open file!");
-    }
-
-    size_t fileSize = (size_t)file.tellg();
-    std::vector<char> buffer(fileSize / sizeof(char));
-
-    file.seekg(0);
-    file.read((char*)buffer.data(), fileSize);
-
-    file.close();
-
+  static ShaderProgram *fromFile(const std::string &filename) {
     ShaderProgram *shaderProgram = new ShaderProgram();
-    shaderProgram->fragShaderSource = std::string(buffer.begin(), buffer.end());
+    shaderProgram->fragShaderSource = read_file(std::string_view(filename));
     shaderProgram->createGLProgram();
 
     return shaderProgram;

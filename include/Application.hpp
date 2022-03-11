@@ -96,7 +96,7 @@ Application::Application(/* args */)
   texture3 = textures[3];
 
 // 
-  const char *filename = "assets/glyph.png";
+  const char *filename = "../assets/glyph.png";
   int imgWidth, imgHeight, imgChannelCount;
   stbi_set_flip_vertically_on_load(true);
   stbi_uc *pixels = stbi_load(filename, &imgWidth, &imgHeight, &imgChannelCount, STBI_rgb_alpha);

@@ -6,7 +6,7 @@ int main(int argc, char **argv, char *envp[]) {
   // std::copy(argv, argv + argc, std::ostream_iterator<char*>(std::cout, "\n"));
   // std::cout << getenv(*envp);
 
-  std::string mainImageFilename("assets/getting_started.glsl");
+  std::string mainImageFilename("../assets/getting_started.glsl");
 
   if (argc < 2) {
     std::cout << "ShadeYourDesktop: missing input file, using default file " << mainImageFilename << std::endl;
@@ -17,7 +17,7 @@ int main(int argc, char **argv, char *envp[]) {
 
   Application *app = new Application();
 
-  ShaderProgram *shaderProgram = ShaderProgram::loadFromFilename(mainImageFilename);
+  ShaderProgram *shaderProgram = ShaderProgram::fromFile(mainImageFilename);
 
   app->mainShaderProgram = shaderProgram;
 

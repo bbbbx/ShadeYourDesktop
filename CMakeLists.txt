@@ -4,7 +4,7 @@ project( ShadeYourDesktop )
 
 set( CMAKE_CXX_STANDARD 17 )
 
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}" )
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin" )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
@@ -44,11 +44,6 @@ endif()
 
 add_executable( ShadeYourDesktop ${SHADE_YOUR_DESKTOP_SRC} )
 target_link_libraries( ShadeYourDesktop glfw )
-
-file(
-  COPY ${CMAKE_CURRENT_SOURCE_DIR}/assets
-  DESTINATION ${CMAKE_BINARY_DIR}
-)
 
 # add_executable( video_decoder src/video_decoder.c )
 # target_link_directories( video_decoder PRIVATE ./lib )
