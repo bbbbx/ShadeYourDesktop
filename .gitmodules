@@ -1,3 +1,6 @@
 [submodule "extern/glfw"]
 	path = extern/glfw
 	url = https://github.com/glfw/glfw.git
+[submodule "extern/ProgramOptions.hxx"]
+	path = extern/ProgramOptions.hxx
+	url = https://github.com/Fytch/ProgramOptions.hxx
