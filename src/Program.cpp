@@ -251,7 +251,7 @@ Program::Program(
   GLuint frag_shader = CreateShader(GL_FRAGMENT_SHADER, GetFullFragmentShaderSource(fragment_shader_source));
   program  = CreateProgram(vertex_shader, frag_shader);
 
-  uniforms = GetActiveUniforms(program);
+  // uniforms = GetActiveUniforms(program);
 }
 
 Program::Program(

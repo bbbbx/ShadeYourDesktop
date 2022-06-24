@@ -3,6 +3,10 @@
 #include <string>
 
 #define PROGRAMOPTIONS_EXCEPTIONS
+// https://github.com/Fytch/ProgramOptions.hxx/issues/1
+#if defined( WIN32 ) || defined( _WIN32 )
+  #define PROGRAMOPTIONS_ANSI
+#endif
 #include <ProgramOptions.hxx>
 
 #include "Program.h"
@@ -12,12 +16,7 @@
 static const GLchar*
 ReadShader( const char* filename )
 {
-#ifdef WIN32
-	FILE* infile;
-	fopen_s( &infile, filename, "rb" );
-#else
   FILE* infile = fopen( filename, "rb" );
-#endif // WIN32
 
   if ( !infile ) {
 

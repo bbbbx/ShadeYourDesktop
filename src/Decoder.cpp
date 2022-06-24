@@ -188,7 +188,8 @@ void* Decoder::GetFrame(float seconds)
 
     return GetFrame(seconds);
   } else if (ret < 0) {
-    printf("call av_read_frame() failed: %s\n", av_err2str(ret));
+    // printf("call av_read_frame() failed: %s\n", av_err2str(ret));
+    printf("call av_read_frame() failed: %d\n", ret);
     return nullptr;
   }
 

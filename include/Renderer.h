@@ -19,7 +19,7 @@ private:
 public:
   glm::vec4 viewport;
   glm::vec4 clearColor;
-  Decoder* decoder;
+  Decoder* decoder = nullptr;
 
   Renderer();
   ~Renderer();

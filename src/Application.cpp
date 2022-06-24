@@ -36,7 +36,7 @@ void Application::run() {
 
   Decoder* decoder = renderer->decoder;
   int prev_frames = -1;
-  void* pixels;
+  void* pixels = nullptr;
   while ( !glfwWindowShouldClose( window ) ) {
     float elapsed_seconds = GetElapsedSeconds(start);
     std::array<float, 2> resolution = { renderer->viewport.z, renderer->viewport.w };
