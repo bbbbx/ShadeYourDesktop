@@ -13,6 +13,8 @@ endif()
 
 project( ShadeYourDesktop )
 
+set( TARGET_NAME ${PROJECT_NAME} )
+
 set( CMAKE_CXX_STANDARD 17 )
 
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin" )
@@ -61,10 +63,9 @@ elseif( MSVC )
   list( APPEND SHADE_YOUR_DESKTOP_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/put_window_behind_desktop_icons_win.cpp" )
 endif()
 
-add_executable( ShadeYourDesktop ${SHADE_YOUR_DESKTOP_SRC} )
-target_link_directories( ShadeYourDesktop PRIVATE
-  ${FFmpeg_LIB} )
-target_link_libraries( ShadeYourDesktop
+add_executable( ${TARGET_NAME} ${SHADE_YOUR_DESKTOP_SRC} )
+target_link_directories( ${TARGET_NAME} PRIVATE ${FFmpeg_LIB} )
+target_link_libraries( ${TARGET_NAME}
   glfw
   avformat
   avcodec
@@ -74,8 +75,8 @@ target_link_libraries( ShadeYourDesktop
 
 if ( MSCV )
   if ( ${CMAKE_VERSION} VERSION_LESS "3.6.0" )
-    message( "\n\t[ WARNING ]\n\n\tCMake version is less then 3.6\n\n\t - Please update CMake and rerun; OR\n\t - Manually set 'ShadeYourDesktop' as StartUp Project in Visual Studio.\n")
+    message( "\n\t[ WARNING ]\n\n\tCMake version is less then 3.6\n\n\t - Please update CMake and rerun; OR\n\t - Manually set '${TARGET_NAME}' as StartUp Project in Visual Studio.\n")
   else()
-    set_property( DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PERPROTY VS_STARTUP_PROJECT ShadeYourDesktop)
+    set_property( DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PERPROTY VS_STARTUP_PROJECT ${TARGET_NAME})
   endif()
 endif()
