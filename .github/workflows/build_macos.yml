@@ -1,0 +1,51 @@
+name: Build macOS
+
+on:
+  push:
+    tags:
+      - '*'
+  pull_request:
+    branches: [main]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        configuration: [Release]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: 'true'
+      - name: Install Package
+        uses: ConorMacBride/install-package@v1.1.0
+        with:
+          brew: ffmpeg
+      - name: Configure CMake
+        run: cmake . -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DFFmpeg_INCLUDE=$(brew --prefix)/include -DFFmpeg_LIB=$(brew --prefix)/lib
+      - name: Build
+        run: cmake --build ${{github.workspace}}/build -j 8 --config ${{matrix.configuration}}
+      - name: Release
+        uses: actions/create-release@v1
+        id: create-release
+        with:
+          draft: false
+          prerelease: false
+          release_name: ${{ github.ref }}
+          tag_name: ${{ github.ref }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: pack into zip
+        run: zip --junk-paths ShadeYourDesktop bin/ShadeYourDesktop
+      - name: Upload artifacts to release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
+          asset_path: ./ShadeYourDesktop.zip
+          asset_name: ShadeYourDesktop.zip
+          asset_content_type: application/zip
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
