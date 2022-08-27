@@ -4,3 +4,6 @@
 [submodule "extern/ProgramOptions.hxx"]
 	path = extern/ProgramOptions.hxx
 	url = https://github.com/Fytch/ProgramOptions.hxx
+[submodule "extern/FFmpeg"]
+	path = extern/FFmpeg
+	url = https://github.com/FFmpeg/FFmpeg.git
